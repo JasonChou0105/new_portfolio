@@ -1,12 +1,16 @@
 import "./App.css";
+import Navbar from "./components/Navbar";
+import Hero from "./components/sections/Hero";
+import About from "./components/sections/About";
 import Background from "./components/Background";
-import Title from "./components/Title";
 
 function App() {
   return (
     <>
+      <Navbar />
       <Background count={100}>
-        <Title />
+        <Hero />
+        {/* <About /> */}
       </Background>
     </>
   );
