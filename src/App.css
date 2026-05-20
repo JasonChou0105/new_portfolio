@@ -29,6 +29,46 @@
   pointer-events: none;
 }
 
+.skills-line {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  overflow: hidden;
+  padding: 1.25rem 0;
+  pointer-events: none;
+}
+
+.skills-line__viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.skills-line__track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  gap: 2.5rem;
+  will-change: transform;
+}
+
+.skills-line__item {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center center;
+  transition: transform 0.1s ease;
+}
+
+.skills-line__img {
+  width: clamp(6.5rem, 14vw, 9.5rem);
+  height: auto;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
 .navbar {
   position: fixed;
   top: 0;

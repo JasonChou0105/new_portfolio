@@ -2,6 +2,20 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const StickersContext = createContext({ tick: 0, frameIntervalMs: 1000 });
 
+export function useStickerTick(frameIntervalMs = 1000) {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setTick((t) => t + 1);
+    }, frameIntervalMs);
+
+    return () => window.clearInterval(id);
+  }, [frameIntervalMs]);
+
+  return tick;
+}
+
 function toCssUnit(value) {
   return typeof value === "number" ? `${value}px` : value;
 }
@@ -91,15 +105,7 @@ export default function Stickers({
   className = "",
   frameIntervalMs = 1000,
 }) {
-  const [tick, setTick] = useState(0);
-
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      setTick((t) => t + 1);
-    }, frameIntervalMs);
-
-    return () => window.clearInterval(id);
-  }, [frameIntervalMs]);
+  const tick = useStickerTick(frameIntervalMs);
 
   return (
     <StickersContext.Provider value={{ tick, frameIntervalMs }}>
