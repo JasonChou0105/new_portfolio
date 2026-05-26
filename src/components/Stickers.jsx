@@ -1,6 +1,22 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import UnfoldingPaper, { getPaperAnchorFromElement } from "./UnfoldingPaper";
 
-const StickersContext = createContext({ tick: 0, frameIntervalMs: 1000 });
+const StickersContext = createContext({
+  tick: 0,
+  frameIntervalMs: 1000,
+  hoverMode: false,
+  openPaperKey: null,
+  openPaper: () => {},
+  closePaper: () => {},
+});
 
 export function useStickerTick(frameIntervalMs = 1000) {
   const [tick, setTick] = useState(0);
@@ -54,64 +70,285 @@ export function Sticker({
   size,
   rotation: baseRotation = 0,
   alt = "",
+  paperContent = null,
+  paperKey: paperKeyProp = null,
 }) {
-  const { tick } = useContext(StickersContext);
+  const { tick, hoverMode, openPaperKey, openPaper, closePaper } =
+    useContext(StickersContext);
+  const autoPaperKey = useId();
+  const paperKey = paperKeyProp ?? autoPaperKey;
+  const stickerRef = useRef(null);
+  const [paperAnchor, setPaperAnchor] = useState(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const isPaperOpen = Boolean(paperContent) && openPaperKey === paperKey;
+
   const normalizedFrames = useMemo(
     () => normalizeFrames({ image, frames, rotateBy }),
     [image, frames, rotateBy],
   );
 
-  const frameIndex =
-    normalizedFrames.length > 0 ? tick % normalizedFrames.length : 0;
-
-  const currentSrc = normalizedFrames[frameIndex]?.src ?? "";
-
-  const rotation = useMemo(() => {
+  const { currentSrc, rotation } = useMemo(() => {
     if (normalizedFrames.length === 0) {
-      return baseRotation;
+      return { currentSrc: "", rotation: baseRotation };
     }
+
+    if (hoverMode) {
+      const showAltFrame =
+        (isHovered || isPaperOpen) && normalizedFrames.length > 1;
+      const frameIndex = showAltFrame ? 1 : 0;
+      const hoverRotation = showAltFrame
+        ? normalizedFrames[frameIndex]?.rotateBy ?? normalizedFrames[0].rotateBy
+        : 0;
+
+      return {
+        currentSrc: normalizedFrames[frameIndex].src,
+        rotation: baseRotation + hoverRotation,
+      };
+    }
+
+    const frameIndex = tick % normalizedFrames.length;
+    const currentSrc = normalizedFrames[frameIndex].src;
 
     if (normalizedFrames.length === 1) {
       const forward = normalizedFrames[0].rotateBy;
       const swing = tick % 2 === 0 ? forward : -forward;
-      return baseRotation + swing;
+      return { currentSrc, rotation: baseRotation + swing };
     }
 
-    return baseRotation + normalizedFrames[frameIndex].rotateBy;
-  }, [tick, frameIndex, normalizedFrames, baseRotation]);
+    return {
+      currentSrc,
+      rotation: baseRotation + normalizedFrames[frameIndex].rotateBy,
+    };
+  }, [tick, hoverMode, isHovered, isPaperOpen, normalizedFrames, baseRotation]);
+
+  const syncPaperAnchor = () => {
+    if (!stickerRef.current) {
+      return;
+    }
+
+    setPaperAnchor(
+      getPaperAnchorFromElement(stickerRef.current, rotation, size),
+    );
+  };
+
+  useEffect(() => {
+    if (!isPaperOpen) {
+      return undefined;
+    }
+
+    syncPaperAnchor();
+
+    const handleLayoutChange = () => syncPaperAnchor();
+    window.addEventListener("resize", handleLayoutChange);
+    window.addEventListener("scroll", handleLayoutChange, true);
+
+    return () => {
+      window.removeEventListener("resize", handleLayoutChange);
+      window.removeEventListener("scroll", handleLayoutChange, true);
+    };
+  }, [isPaperOpen, rotation, size]);
+
+  const handlePaperClosed = () => {
+    setPaperAnchor(null);
+  };
+
+  const handleClick = (event) => {
+    if (!paperContent) {
+      return;
+    }
+
+    event.stopPropagation();
+
+    if (isPaperOpen) {
+      closePaper();
+      return;
+    }
+
+    syncPaperAnchor();
+    openPaper(paperKey);
+  };
+
+  const handlePointerDown = (event) => {
+    if (!paperContent) {
+      return;
+    }
+    event.stopPropagation();
+  };
 
   if (!currentSrc) {
     return null;
   }
 
+  const isInteractive = Boolean(paperContent);
+
   return (
-    <img
-      src={currentSrc}
-      alt={alt}
-      className="sticker"
-      draggable={false}
-      style={{
-        left: toCssUnit(x),
-        top: toCssUnit(y),
-        width: toCssUnit(size),
-        transform: `rotate(${rotation}deg)`,
+    <>
+      <img
+        ref={stickerRef}
+        src={currentSrc}
+        alt={alt}
+        role={isInteractive ? "button" : undefined}
+        tabIndex={isInteractive ? 0 : undefined}
+        className={[
+          "sticker",
+          isInteractive && "sticker--interactive",
+          hoverMode && "sticker--hoverable",
+          isPaperOpen && "sticker--paper-open",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        draggable={false}
+        onMouseEnter={hoverMode ? () => setIsHovered(true) : undefined}
+        onMouseLeave={hoverMode ? () => setIsHovered(false) : undefined}
+        onPointerDown={isInteractive ? handlePointerDown : undefined}
+        onClick={isInteractive ? handleClick : undefined}
+        onKeyDown={
+          isInteractive
+            ? (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  handleClick(event);
+                }
+              }
+            : undefined
+        }
+        style={{
+          left: toCssUnit(x),
+          top: toCssUnit(y),
+          width: toCssUnit(size),
+          transform: `rotate(${rotation}deg) scale(${
+            hoverMode && (isHovered || isPaperOpen) ? 1.08 : 1
+          })`,
+        }}
+      />
+      {paperContent && paperAnchor && (
+        <UnfoldingPaper
+          open={isPaperOpen}
+          anchor={paperAnchor}
+          onClosed={handlePaperClosed}
+        >
+          {paperContent}
+        </UnfoldingPaper>
+      )}
+    </>
+  );
+}
+
+function StickersAnimated({ children, className, frameIntervalMs }) {
+  const tick = useStickerTick(frameIntervalMs);
+  const [openPaperKey, setOpenPaperKey] = useState(null);
+
+  const openPaper = (key) => setOpenPaperKey(key);
+  const closePaper = () => setOpenPaperKey(null);
+
+  useEffect(() => {
+    if (!openPaperKey) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      if (
+        event.target.closest(".unfolding-paper") ||
+        event.target.closest(".sticker")
+      ) {
+        return;
+      }
+      closePaper();
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [openPaperKey]);
+
+  return (
+    <StickersContext.Provider
+      value={{
+        tick,
+        frameIntervalMs,
+        hoverMode: false,
+        openPaperKey,
+        openPaper,
+        closePaper,
       }}
-    />
+    >
+      <div
+        className={["stickers", "stickers--interactive", className]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        {children}
+      </div>
+    </StickersContext.Provider>
+  );
+}
+
+function StickersHover({ children, className }) {
+  const [openPaperKey, setOpenPaperKey] = useState(null);
+
+  const openPaper = (key) => setOpenPaperKey(key);
+  const closePaper = () => setOpenPaperKey(null);
+
+  useEffect(() => {
+    if (!openPaperKey) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event) => {
+      if (
+        event.target.closest(".unfolding-paper") ||
+        event.target.closest(".sticker")
+      ) {
+        return;
+      }
+      closePaper();
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [openPaperKey]);
+
+  return (
+    <StickersContext.Provider
+      value={{
+        tick: 0,
+        frameIntervalMs: 0,
+        hoverMode: true,
+        openPaperKey,
+        openPaper,
+        closePaper,
+      }}
+    >
+      <div
+        className={["stickers", "stickers--interactive", className]
+          .filter(Boolean)
+          .join(" ")}
+      >
+        {children}
+      </div>
+    </StickersContext.Provider>
   );
 }
 
 export default function Stickers({
   children,
   className = "",
+  hoverMode = false,
   frameIntervalMs = 1000,
 }) {
-  const tick = useStickerTick(frameIntervalMs);
+  if (hoverMode) {
+    return <StickersHover className={className}>{children}</StickersHover>;
+  }
 
   return (
-    <StickersContext.Provider value={{ tick, frameIntervalMs }}>
-      <div className={["stickers", className].filter(Boolean).join(" ")}>
-        {children}
-      </div>
-    </StickersContext.Provider>
+    <StickersAnimated className={className} frameIntervalMs={frameIntervalMs}>
+      {children}
+    </StickersAnimated>
   );
 }

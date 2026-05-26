@@ -110,19 +110,20 @@ export default function NotebookBackground({ children, count = 35 }) {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative min-h-screen overflow-hidden"
+      className="relative w-full"
     >
-      {/* lined paper background layer */}
+      {/* Decorative layers — fixed so scroll is driven only by paper-stack */}
       <div
-        className="absolute inset-0 z-0 bg-repeat-y bg-top"
+        className="pointer-events-none fixed inset-0 z-0 bg-repeat-y bg-top"
         style={{
           backgroundImage: "url('/images/background/lined_paper.png')",
           backgroundSize: "100% auto",
         }}
+        aria-hidden
       />
 
       {/* crumple texture layer */}
-      <div className="pointer-events-none absolute inset-0 z-10">
+      <div className="pointer-events-none fixed inset-0 z-10">
         {baseCrumples.map((crumple) => {
           const change = crumpleChanges[crumple.id];
 
@@ -151,7 +152,7 @@ export default function NotebookBackground({ children, count = 35 }) {
       </div>
 
       {/* content layer */}
-      <main className="relative z-20 min-h-screen">{children}</main>
+      <main className="paper-stack relative z-20">{children}</main>
     </div>
   );
 }

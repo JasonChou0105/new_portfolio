@@ -1,14 +1,12 @@
+import PaperSection from "../PaperSection";
 import SkillsLine from "../SkillsLine";
 
 function Skills() {
   return (
-    <section id="skills" className="relative z-20 w-full">
-      <div className="mx-auto flex justify-center items-center w-full max-w-6xl flex-col gap-10 px-6 sm:px-10">
-        <h2 className="crayon-text text-left text-4xl text-slate-800 sm:text-5xl">
-          Skills
-        </h2>
-        <div className="flex flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-14">
-          <div className="flex w-full justify-center lg:w-2/5 lg:justify-start">
+    <PaperSection layer={2} id="skills">
+      <div className="mx-auto flex h-full w-full max-w-6xl flex-col px-6 py-16 sm:px-10 sm:py-20">
+        <div className="flex flex-1 flex-col gap-10 sm:flex-row sm:items-stretch sm:gap-14">
+          <div className="flex w-full shrink-0 justify-center sm:w-2/5 sm:justify-start">
             <img
               src="/images/eye_tracking/chud1.png"
               alt="Portrait"
@@ -16,17 +14,22 @@ function Skills() {
               draggable={false}
             />
           </div>
-          <div className="flex w-full flex-col items-start text-left lg:w-3/5">
-            <p className="crayon-text max-w-xl text-lg leading-loose tracking-wide text-slate-800 sm:text-xl">
-              I build with Python, JavaScript, C++, Java, and Unity. From web
-              apps and tools to games and experiments. Always picking up new
-              stacks and shipping projects along the way.
+          <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
+            <h2 className="crayon-text text-left text-4xl text-slate-800 sm:text-5xl">
+              Skills
+            </h2>
+            <p className="crayon-text mt-4 max-w-xl text-lg leading-loose tracking-wide text-slate-800 sm:text-xl">
+              Lorem ipsum, dolor sit amet consectetur adipisicing elit. Et iure
+              ut unde corrupti molestias quaerat omnis sint! Corrupti ex quod
+              expedita fugit, quis dolorum reiciendis aspernatur quisquam iusto
+              provident minus?
             </p>
+            <div className="min-h-6 flex-1" aria-hidden="true" />
+            <SkillsLine />
           </div>
         </div>
       </div>
-      <SkillsLine frameIntervalMs={750} />
-    </section>
+    </PaperSection>
   );
 }
 
