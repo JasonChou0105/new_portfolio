@@ -72,14 +72,15 @@ function SkillSticker({ skill }) {
 
 function SkillsLine({ className = "" }) {
   return (
-    <aside
+    <div
       className={["skills-line", className].filter(Boolean).join(" ")}
+      role="group"
       aria-label="Skill stickers"
     >
       {SKILL_STICKERS.map((skill) => (
         <SkillSticker key={skill.alt} skill={skill} />
       ))}
-    </aside>
+    </div>
   );
 }
 

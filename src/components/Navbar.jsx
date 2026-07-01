@@ -24,7 +24,11 @@ function makeJaggedBottomClipPath(seed) {
 
 const NAVBAR_CLIP = makeJaggedBottomClipPath(42);
 
-const NAV_LINKS = ["About", "Projects", "Skills", "Contact"];
+const NAV_LINKS = [
+  { label: "About", href: "#about" },
+  { label: "Projects", href: "#projects" },
+  { label: "Skills", href: "#skills" },
+];
 
 function Navbar() {
   return (
@@ -44,9 +48,9 @@ function Navbar() {
             Jason Chou
           </a>
           <ul className="navbar__links">
-            {NAV_LINKS.map((label) => (
+            {NAV_LINKS.map(({ label, href }) => (
               <li key={label}>
-                <a href="#" className="crayon-text navbar__link">
+                <a href={href} className="crayon-text navbar__link">
                   {label}
                 </a>
               </li>
