@@ -4,7 +4,7 @@ import SkillsLine from "../SkillsLine";
 function Skills() {
   return (
     <PaperSection layer={4} id="skills">
-      <div className="mx-auto flex h-full w-full max-w-6xl flex-col px-6 py-16 sm:px-10 sm:py-20">
+      <div className="mx-auto flex h-full w-full max-w-6xl flex-col px-6 pb-16 pt-28 sm:px-10 sm:pb-20 sm:pt-36">
         <div className="flex flex-1 flex-col gap-10 sm:flex-row sm:items-stretch sm:gap-14">
           <div className="flex w-full shrink-0 justify-center sm:w-2/5 sm:justify-start">
             <img

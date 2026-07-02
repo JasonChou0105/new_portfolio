@@ -8,7 +8,7 @@
 .crayon-text {
   font-family: "Crayon", sans-serif;
   letter-spacing: 0.2em;
-  line-height: 1.2;
+  line-height: 1.25;
   color: #3c393a;
 }
 
@@ -241,6 +241,116 @@
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
+}
+
+/* --- Hobby flip cards (About section) --- */
+.hobby-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 12rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  perspective: 1000px;
+  transform-origin: center center;
+  transition: transform 0.25s ease;
+}
+
+.hobby-card--wide {
+  min-height: 14rem;
+}
+
+.hobby-card:hover {
+  transform: scale(1.03);
+}
+
+.hobby-card:focus-visible {
+  outline: 3px solid rgba(0, 145, 145, 0.7);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.hobby-card__inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+}
+
+.hobby-card--flipped .hobby-card__inner {
+  transform: rotateY(180deg);
+}
+
+.hobby-card__face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: #faf6f7;
+  border: 2px solid rgba(60, 57, 58, 0.18);
+  border-radius: 8px;
+  box-shadow:
+    3px 4px 0 rgba(60, 57, 58, 0.12),
+    0 6px 16px rgba(0, 0, 0, 0.08);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.hobby-card__back {
+  transform: rotateY(180deg);
+  justify-content: center;
+  text-align: center;
+}
+
+.hobby-card__sticker {
+  width: auto;
+  max-width: 70%;
+  max-height: 7.5rem;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  transform-origin: center center;
+  transition: transform 0.2s ease;
+}
+
+.hobby-card--wide .hobby-card__sticker {
+  max-height: 9rem;
+}
+
+.hobby-card__title {
+  font-size: 1.5rem;
+  color: #3c393a;
+}
+
+.hobby-card__back-title {
+  font-size: 1.5rem;
+  color: #3c393a;
+}
+
+.hobby-card__back-text {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  color: #3c393a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hobby-card,
+  .hobby-card__inner,
+  .hobby-card__sticker {
+    transition: none;
+  }
 }
 
 .unfolding-paper {

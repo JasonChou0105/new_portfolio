@@ -140,7 +140,7 @@ function Projects() {
           .join(" ")}
       >
         <div className="projects-inner flex h-full w-full flex-col">
-          <h2 className="crayon-text shrink-0 px-6 pt-24 text-left text-4xl text-slate-800 sm:px-10 sm:text-5xl">
+          <h2 className="crayon-text shrink-0 px-6 pt-36 text-left text-4xl text-slate-800 sm:px-10 sm:text-5xl">
             Projects
           </h2>
 
