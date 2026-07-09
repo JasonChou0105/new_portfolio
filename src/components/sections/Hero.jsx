@@ -5,7 +5,7 @@ import Stickers, { Sticker, stickerFrames } from "../Stickers";
 
 function Hero() {
   return (
-    <PaperSection layer={1}>
+    <PaperSection layer={1} drawSurfaceId="hero">
       <div className="relative mx-auto flex h-full w-full max-w-6xl flex-col items-start gap-10 px-16 pb-12 pt-40 sm:px-10 lg:flex-row lg:items-center lg:gap-16 lg:pb-20 lg:pt-44">
         <Stickers frameIntervalMs={750}>
           <Sticker

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+import DrawingSurface from "../crayon/DrawingSurface";
+
 const PROJECTS = [
   { id: "01", title: "Project 01" },
   { id: "02", title: "Project 02" },
@@ -139,14 +141,10 @@ function Projects() {
           .filter(Boolean)
           .join(" ")}
       >
-        <div className="projects-inner flex h-full w-full flex-col">
-          <h2 className="crayon-text shrink-0 px-6 pt-36 text-left text-4xl text-slate-800 sm:px-10 sm:text-5xl">
-            Projects
-          </h2>
-
+        <div className="projects-inner">
           <div
             ref={viewportRef}
-            className="projects-viewport min-h-0 flex-1 overflow-x-clip lg:overflow-x-hidden lg:overflow-y-visible"
+            className="projects-viewport overflow-x-clip lg:overflow-x-hidden lg:overflow-y-visible"
           >
             <div
               ref={trackRef}
@@ -157,13 +155,21 @@ function Projects() {
                   : "projects-track--stacked",
               ].join(" ")}
             >
-              {PROJECTS.map((project, index) => (
+              <DrawingSurface id="projects-track" />
+              <div className="flex flex-col gap-4"><header className="projects-header shrink-0">
+                <h2 className="crayon-text text-left text-4xl text-slate-800 sm:text-5xl">
+                  Projects
+                </h2>
+              </header>
+              <div className="flex flex-row gap-12">{PROJECTS.map((project, index) => (
                 <ProjectCard
                   key={project.id}
                   title={project.title}
                   index={index}
                 />
-              ))}
+              ))}</div>
+              </div>
+              
             </div>
           </div>
         </div>
